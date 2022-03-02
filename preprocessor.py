@@ -91,7 +91,7 @@ class TextCleaner:
         """ 
         Cleaning the text column.
         """
-        data = load_data(self.data_path)
+        data = load_data(self.data_path, self.text_column, self.lable_column)
         data['fortmatted_text'] = data['text'].apply(lambda x: self._handle_contradictions(x))
         data['fortmatted_text'] = data['fortmatted_text'].apply(lambda x: self._normalize_text(x))
         data['fortmatted_text'] = data['fortmatted_text'].apply(lambda x: self._remove_stopwords(x))
@@ -109,12 +109,6 @@ class LabelMaker:
         self.lable_column = lable_column
 
 
-
-
-
-
-
-
 def save_data(path, dataframe):
     """
     Saving a dataframe.
@@ -122,14 +116,14 @@ def save_data(path, dataframe):
     dataframe.to_csv(path , index = False)
 
 
-def load_data(path):
+def load_data(path, text_column, lable_column):
     """
     Loading the raw data from the dirrectory
     Return:
     -----------
     raw_data : The raw data, a pandas dataframe object.
     """
-    raw_data = pd.read_csv(self.path , usecols = [self.text_column, self.lable_column])
+    raw_data = pd.read_csv(path , usecols = [text_column, lable_column])
     return raw_data
 
 
