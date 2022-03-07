@@ -20,7 +20,7 @@ logger = logging.getLogger()
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-class TextCleaner:
+class Preprocess:
     """
     This is text cleaning steps implementation for intent classifications in chat-bot user utterences.
     """
@@ -125,34 +125,66 @@ class TextCleaner:
         logger.info('Removed all numerica characters and additional spaces')
         data['fortmatted_text'] = data['fortmatted_text'].apply(lambda x: self._remove_stopwords(x))
         logger.info('Removed stopwords from text data')
-
         save_data(data_path , data)
 
-
-class LabelEncoder:
-    """
-    Encoding categorical lables.
-    """
-
-    def __init__(self, data_path, save_path, text_column = 'fortmatted_text', lable_column = 'category'):
-        self.data_path = data_path
-        self.text_column = text_column
-        self.lable_column = lable_column
-
-    def encode_lables():
+    def encode_lables(self, input_data , text_column = 'fortmatted_text', lable_column = 'category'):
         """
-        Encoding categorical lables, 
+        Encoding categorical lables. 
+        Parameters:
+        -----------
+        input_data : File name of input data, String
+        text_column : String
+        lable_column : Sring
+        Return:
+        -----------
+        train_data : Dataframe, dataframe with x and y axis for training.
+
         """
-        data = load_data(self.data_path, self.text_column, self.lable_column)
+        try:
+          data_path = os.path.join(self.base_dir, input_data)
+          data = load_data(data_path, text_column, lable_column)
+          logger.info('Loaded data from path: %s' % data_path)
+        except Exception as e:
+          logger.info('Exiting due to exception: %s' % e)
+          traceback.print_exc()
+
         possible_labels = data.category.unique()
         label_dict = {}
-        for index, possible_label in enumerate(possible_labels):
-            label_dict[possible_label] = index
-        data['label'] = data.category.replace(label_dict)
+
+        try:
+          for index, possible_label in enumerate(possible_labels):
+              label_dict[possible_label] = index
+          data['label'] = data.category.replace(label_dict)
+        except Exception as e:
+          logger.info('Exiting due to exception: %s' % e)
+          traceback.print_exc()
+
+        output_dir = '/content/drive/MyDrive/text_classification/train'
+
+        if not os.path.exists(output_dir):
+          os.makedirs(output_dir)
 
         #taking category and label into dataframe.
         label_df = pd.DataFrame(label_dict.items() , columns = ['category' , 'label'])
-        save_data(label_df, self.save_path)
+        label_df_path = os.path.join(output_dir,'labels')
+        try:
+          save_data(label_df_path,label_df)
+          logger.info('Saved the label table, Path : %s' % label_df_path)
+        except Exception as e:
+          logger.info('Exiting due to exception: %s' % e)
+          traceback.print_exc()
+          
+        #saving training_data
+        train_data_path = os.path.join(output_dir,'train')
+        train_data = data[[text_column , 'label']]
+        try:
+          save_data(train_data_path,train_data)
+          logger.info('Saved the train data, Path : %s' % train_data_path)
+        except Exception as e:
+          logger.info('Exiting due to exception: %s' % e)
+          traceback.print_exc()
+
+        return train_data
 
 
 def save_data(path, dataframe):
@@ -164,7 +196,7 @@ def save_data(path, dataframe):
     except Exception as e:
       logger.info('Exiting due to exception: %s' % e)
       traceback.print_exc()
-    logger.info('Saved cleaned data into loacation: %s' % path)
+
 
 
 def load_data(path, text_column, lable_column):
@@ -172,15 +204,10 @@ def load_data(path, text_column, lable_column):
     Loading the raw data from the dirrectory
     Return:
     -----------
-    raw_data : The raw data, a pandas dataframe object.
+    data : The raw data, a pandas dataframe object.
     """
-    try:
-      raw_data = pd.read_csv(path , usecols = [text_column, lable_column])
-      logger.info('Loaded raw data from path: %s' % path)
-    except Exception as e:
-      logger.info('Exiting due to exception: %s' % e)
-      traceback.print_exc()
-    return raw_data      
+    data = pd.read_csv(path , usecols = [text_column, lable_column])
+    return data         
 
 
 def parse_args():
