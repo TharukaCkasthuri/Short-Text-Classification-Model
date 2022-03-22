@@ -5,22 +5,25 @@ Created on Sat Mar 19 14:52:00 2022
 
 @author: tharuka
 """
-
-import torch.nn as nn
+import torch
+#import torch.nn as nn
 from transformers import BertModel
 
-class BertWithLSTMClassifier(nn.Module):
+import logging
+logging.basicConfig(format='%(name)s - %(asctime)s - %(levelname)s - %(message)s' , level=logging.INFO) 
+
+class BertWithLSTMClassifier(torch.nn.Module):
     """
     A pre-trained BERT model with a LSTM layer for classification.
     """
     
-    def __init__(self , n_classes):
+    def __init__(self , n_classes, model_name):
         super(BertWithLSTMClassifier, self).__init__()
         self.n_classes = n_classes
         self.bert = BertModel.from_pretrained(model_name)
         self.hidden_size = self.bert.config.hidden_size
-        self.lstm = nn.LSTM(self.hidden_size, self.hidden_size, batch_first=True, bidirectional=False)
-        self.linear = nn.Linear(self.hidden_size, self.n_classes)
+        self.lstm = torch.nn.LSTM(self.hidden_size, self.hidden_size, batch_first=True, bidirectional=False)
+        self.linear = torch.nn.Linear(self.hidden_size, self.n_classes)
 
     def forward(self, tokens, attention_mask):
         """
