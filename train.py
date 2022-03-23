@@ -19,6 +19,7 @@ import preprocess
 import models
 
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 from transformers import AutoTokenizer
 from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
@@ -226,8 +227,8 @@ def setup():
     """
     if torch.cuda.is_available():        
         device = torch.device("cuda")
-        logging.info('Running on GPU:', torch.cuda.get_device_name(0))
-        print('Running on GPU:', torch.cuda.get_device_name(0))
+        logging.info('Running on GPU: %s', torch.cuda.get_device_name(0))
+        print('Running on GPU: s', torch.cuda.get_device_name(0))
     else:
         device = torch.device("cpu")
         logging.info('Running on CPU.')

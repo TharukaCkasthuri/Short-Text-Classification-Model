@@ -78,7 +78,7 @@ class TextCleaner:
 
         Return:
         -----------
-        result_non_space : text without numerica characters, String
+        result_non_space : text without numerical characters, String
         """
         text_lower = text.lower()
         try:
@@ -130,7 +130,7 @@ class TextCleaner:
         input_data['fortmatted_text'] = input_data['text'].apply(lambda x: self._handle_contradictions(x))
         logging.info('Completed expanding contradictions')
         input_data['fortmatted_text'] = input_data['fortmatted_text'].apply(lambda x: self._normalize_text(x))
-        logging.info('Removed all numerica characters and additional spaces')
+        logging.info('Removed all numerical characters and additional spaces')
         input_data['fortmatted_text'] = input_data['fortmatted_text'].apply(lambda x: self._remove_stopwords(x ,stopwords))
         logging.info('Removed stopwords from text data')
         #save_data(data_path , data)
