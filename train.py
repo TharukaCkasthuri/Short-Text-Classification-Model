@@ -54,41 +54,58 @@ def parse_args():
     return parser.parse_args()
 
 def prepare_data(base_dir, input_data, text_column, label_column, stopwords_file, bert_model, hparams):
-  try:
-    input_data_path = os.path.join(base_dir,input_data)
-    data = pd.read_csv(input_data_path , usecols= [text_column, label_column])
-  except ValueError as ve:
-    print('Exiting due to exception: %s' % ve)
-    print('Make sure the entered column names are correct!')
-    traceback.print_exc()
-  except FileNotFoundError as fe:
-    print('Exiting due to exception: %s' % fe)
-    print('Make sure the entered path to the data set is correct!')
-    traceback.print_exc()
-  except Exception as e:
-    logging.info('Exiting due to exception: %s' % e)
-    print('Exiting due to exception: %s' % e)
-    traceback.print_exc()
+    """
+    Preprocessing data to feed into nueral network.
 
-  cleaner = preprocess.TextCleaner(stopwords_file)
-  cleaned_data = cleaner.text_clean(data)
-  encoder = preprocess.Encoder(base_dir)
-  X,y, label_df = encoder.encode_lables(cleaned_data , label_column = label_column)
-  train_x, val_x, train_y, val_y = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
-  logging.info('Size of train data (# of entries): %s', len(train_x))
-  logging.info('Size of validation data (# of entries): %s ', len(val_x))
-  logging.info('Downloading  %s ', bert_model)
-  tokenizer = AutoTokenizer.from_pretrained(bert_model)
-  train_encodings = tokenizer(train_x.tolist(), truncation=True, padding=True)
-  val_encodings = tokenizer(val_x.tolist(), truncation=True, padding=True)
-  logging.info('Training and validation data has been encoded with %s ', bert_model)
-  train_dataset = preprocess.CustomDataset(train_encodings, train_y)
-  val_dataset = preprocess.CustomDataset(val_encodings, val_y)
-  train_loader = DataLoader(train_dataset, batch_size=hparams["batch_size"], shuffle=True)
-  val_loader = DataLoader(val_dataset, batch_size=hparams["batch_size"], shuffle=True)
-  logging.info('Created train & val datasets.')  
+    Parameters:
+    -----------
+    base_dir: 
+    input_data: 
+    text_column:
+    label_column:
+    stopwords_file:
+    bert_model:
+    hparams:
+    Return:
+    -----------
+    train_loader: 
+    val_loader:
+    """
+    try:
+        input_data_path = os.path.join(base_dir,input_data)
+        data = pd.read_csv(input_data_path , usecols= [text_column, label_column])
+    except ValueError as ve:
+        print('Exiting due to exception: %s' % ve)
+        print('Make sure the entered column names are correct!')
+        traceback.print_exc()
+    except FileNotFoundError as fe:
+        print('Exiting due to exception: %s' % fe)
+        print('Make sure the entered path to the data set is correct!')
+        traceback.print_exc()
+    except Exception as e:
+        logging.info('Exiting due to exception: %s' % e)
+        print('Exiting due to exception: %s' % e)
+        traceback.print_exc()
 
-  return train_loader,val_loader
+    cleaner = preprocess.TextCleaner(stopwords_file)
+    cleaned_data = cleaner.text_clean(data)
+    encoder = preprocess.Encoder(base_dir)
+    X,y, label_df = encoder.encode_lables(cleaned_data , label_column = label_column)
+    train_x, val_x, train_y, val_y = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+    logging.info('Size of train data (# of entries): %s', len(train_x))
+    logging.info('Size of validation data (# of entries): %s ', len(val_x))
+    logging.info('Downloading  %s ', bert_model)
+    tokenizer = AutoTokenizer.from_pretrained(bert_model)
+    train_encodings = tokenizer(train_x.tolist(), truncation=True, padding=True)
+    val_encodings = tokenizer(val_x.tolist(), truncation=True, padding=True)
+    logging.info('Training and validation data has been encoded with %s ', bert_model)
+    train_dataset = preprocess.CustomDataset(train_encodings, train_y)
+    val_dataset = preprocess.CustomDataset(val_encodings, val_y)
+    train_loader = DataLoader(train_dataset, batch_size=hparams["batch_size"], shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=hparams["batch_size"], shuffle=True)
+    logging.info('Created train & val datasets.')  
+
+    return train_loader,val_loader
 
 def eval_prediction(y_batch_actual, y_batch_predicted):
     """Return batches of accuracy and f1 scores.
