@@ -196,7 +196,7 @@ def train(base_dir, train_loader, val_loader, model, num_of_epochs, optimizer, l
 
     tqdm.pandas()
     best_acc, best_f1 = 0, 0
-    model_dir = str(model) + "trained_model.pt"
+    model_dir = "trained_model.pt"
     path = os.path.join(base_dir,model_dir)
 
     for i in tqdm(range(num_of_epochs)):
