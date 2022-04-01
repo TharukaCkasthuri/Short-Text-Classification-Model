@@ -209,11 +209,14 @@ def train(base_dir, train_loader, val_loader, model, num_of_epochs, optimizer, l
             print("Bert is freezed")
         
         training_step(train_loader, model,optimizer, loss_fn, if_freeze_bert)
+
         train_acc, train_f1 = validation_step(train_loader, model, loss_fn)
         val_acc, val_f1 = validation_step(val_loader, model, loss_fn)
         
         print("Training results: ")
         print("Acc: {:.3f}, f1: {:.3f}".format(train_acc, train_f1))
+        logging.info("Training Accuracy : {acc} Training F1 Score: {f1}".format(acc=train_acc, f1=train_f1))
+
         
         print("Validation results: ")
         print("Acc: {:.3f}, f1: {:.3f}".format(val_acc, val_f1))
