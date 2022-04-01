@@ -193,7 +193,7 @@ def evaluation_step(dataloader, model, loss_fn):
 
         acc = round(acc/size, 2)
         f1 = round(f1/size, 2)
-        loss = round(loss/size, 2)
+        loss = round(loss.item()/size, 2)
                 
     return acc, f1, loss
 
