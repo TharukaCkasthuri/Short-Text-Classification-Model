@@ -159,7 +159,7 @@ def training_step(dataloader, model, optimizer, loss_fn, if_freeze_bert):
         loss.backward()
         optimizer.step()
 
-def validation_step(dataloader, model, loss_fn):
+def evaluation_step(dataloader, model, loss_fn):
     """Method to test the model's accuracy and loss on the validation set.
 
     Parameters:
@@ -172,11 +172,12 @@ def validation_step(dataloader, model, loss_fn):
     -----------
     acc:
     f1:
+    loss:
     """
     model.eval()
     model.freeze_bert()
     size = len(dataloader)
-    f1, acc = 0, 0
+    f1, acc, loss = 0, 0, 0
     with torch.no_grad():
         for batch in dataloader:
             X = batch['input_ids'].to(device)
@@ -184,13 +185,17 @@ def validation_step(dataloader, model, loss_fn):
             y = batch['labels'].to(device)  
             pred = model(tokens=X, attention_mask=attention_mask)
             big_val, big_idx = torch.max(pred.data, dim=1)
-            acc_batch, f1_batch = eval_prediction(y.float(), big_idx)                        
+            acc_batch, f1_batch = eval_prediction(y.float(), big_idx) 
+            loss_batch = loss_fn(pred, y.long())                       
             acc += acc_batch
             f1 += f1_batch
-        acc = acc/size
-        f1 = f1/size
+            loss += loss_batch
+
+        acc = round(acc/size, 2)
+        f1 = round(f1/size, 2)
+        loss = round(loss/size, 2)
                 
-    return acc, f1
+    return acc, f1, loss
 
 def train(base_dir, train_loader, val_loader, model, num_of_epochs, optimizer, loss_fn, if_freeze_bert ):
 
@@ -210,16 +215,18 @@ def train(base_dir, train_loader, val_loader, model, num_of_epochs, optimizer, l
         
         training_step(train_loader, model,optimizer, loss_fn, if_freeze_bert)
 
-        train_acc, train_f1 = validation_step(train_loader, model, loss_fn)
-        val_acc, val_f1 = validation_step(val_loader, model, loss_fn)
+        train_acc, train_f1, train_loss = evaluation_step(train_loader, model, loss_fn)
+        val_acc, val_f1, val_loss = evaluation_step(val_loader, model, loss_fn)
         
         print("Training results: ")
         print("Acc: {:.3f}, f1: {:.3f}".format(train_acc, train_f1))
-        logging.info("Training Accuracy : {acc} Training F1 Score: {f1}".format(acc=train_acc, f1=train_f1))
+        logging.info("Training Loss : {loss} Training Accuracy : {acc} Training F1 Score: {f1}".format(loss=train_loss, acc=train_acc, f1=train_f1))
 
         
         print("Validation results: ")
         print("Acc: {:.3f}, f1: {:.3f}".format(val_acc, val_f1))
+        logging.info("Validation Loss : {loss} Validation Accuracy : {acc} Validation F1 Score: {f1}".format(loss=val_loss, acc=val_acc, f1=val_f1))
+
         
         if val_acc > best_acc:
             best_acc = val_acc    
