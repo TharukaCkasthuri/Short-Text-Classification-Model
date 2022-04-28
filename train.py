@@ -37,7 +37,7 @@ def parse_args():
     parser = argparse.ArgumentParser(
         prog="Intent Classifier",
         description="This is to train intent classification model")
-    parser.add_argument('--classifier', nargs='?', default='BertWithBiLSTMClassifier'
+    parser.add_argument('--classifier', nargs='?', default='BertWithBiLSTMClassifier',
                         help='name of the classifier model.')
     parser.add_argument('--stopwords_file', nargs='?', default='stopwords.txt',
                         help='file name of the stopwords.')
