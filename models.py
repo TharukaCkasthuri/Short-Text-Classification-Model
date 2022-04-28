@@ -57,7 +57,7 @@ class BertWithBiLSTMClassifier(torch.nn.Module):
     """
     A pre-trained BERT model with a Bidirectional LSTM layer for classification.
     """    
-    def __init__(self , n_classes):
+    def __init__(self , n_classes, model_name):
         super(BertWithBiLSTMClassifier, self).__init__()
         self.n_classes = n_classes
         self.bert = BertModel.from_pretrained(model_name)
