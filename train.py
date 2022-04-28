@@ -8,6 +8,7 @@ Created on Sat Mar 19 15:14:00 2022
 
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 import time
 import argparse
@@ -36,7 +37,7 @@ def parse_args():
     parser = argparse.ArgumentParser(
         prog="Intent Classifier",
         description="This is to train intent classification model")
-    parser.add_argument('--classifier', nargs='?',
+    parser.add_argument('--classifier', nargs='?', default='BertWithBiLSTMClassifier'
                         help='name of the classifier model.')
     parser.add_argument('--stopwords_file', nargs='?', default='stopwords.txt',
                         help='file name of the stopwords.')
@@ -197,16 +198,23 @@ def evaluation_step(dataloader, model, loss_fn):
                 
     return acc, f1, loss
 
-def train(base_dir, train_loader, val_loader, model, num_of_epochs, optimizer, loss_fn, if_freeze_bert ):
+def train(base_dir, train_loader, val_loader, model, num_of_epochs, optimizer, loss_fn, if_freeze_bert):
+    """
+    """
 
     tqdm.pandas()
     best_acc, best_f1 = 0, 0
-    model_dir = "trained_model.pt"
-    path = os.path.join(base_dir,model_dir)
+    model_file_name = str(time.time()) + "_trained_model.pt"
+    path = os.path.join(base_dir,model_file_name)
+
+    train_f1s = []
+    validation_f1s = []
+    train_losses = []
+    validation_losses = []
 
     for i in tqdm(range(num_of_epochs)):
         print("Epoch: #{}".format(i+1))
-        if i < 5:
+        if i < 10:
             if_freeze_bert = False
             print("Bert is not freezed")
         else:
@@ -217,20 +225,34 @@ def train(base_dir, train_loader, val_loader, model, num_of_epochs, optimizer, l
 
         train_acc, train_f1, train_loss = evaluation_step(train_loader, model, loss_fn)
         val_acc, val_f1, val_loss = evaluation_step(val_loader, model, loss_fn)
+        train_f1s.append(train_f1.item())
+        validation_f1s.append(val_f1.item())
+        train_losses.append(train_loss.item())
+        validation_losses.append(validation_loss.item())
         
-        print("Training results: ")
-        print("Acc: {:.3f}, f1: {:.3f}".format(train_acc, train_f1))
+        #print("Training results: ")
+        #print("Acc: {:.3f}, f1: {:.3f}".format(train_acc, train_f1))
         logging.info("Training Loss : {loss} Training Accuracy : {acc} Training F1 Score: {f1}".format(loss=train_loss, acc=train_acc, f1=train_f1))
 
-        
-        print("Validation results: ")
-        print("Acc: {:.3f}, f1: {:.3f}".format(val_acc, val_f1))
+        #print("Validation results: ")
+        #print("Acc: {:.3f}, f1: {:.3f}".format(val_acc, val_f1))
         logging.info("Validation Loss : {loss} Validation Accuracy : {acc} Validation F1 Score: {f1}".format(loss=val_loss, acc=val_acc, f1=val_f1))
 
         
         if val_acc > best_acc:
             best_acc = val_acc    
             torch.save(model, path)
+
+    plt.figure(figsize=(12,6)) 
+    plt.plot(range(1, num_of_epochs+1), train_f1s, 'g', label='Training F1 Score Curve')
+    plt.plot(range(1, num_of_epochs+1), validation_f1s, 'r', label='Validation F1 Score Curve')
+    plt.plot(range(1, num_of_epochs+1), train_losses, 'b', label='Training Loss Curve')
+    plt.plot(range(1, num_of_epochs+1), validation_losses, 'c', label='Validation Loss Curve')
+    plt.title("Training/Validation F1 Score/Loss Curves")
+    plt.legend()
+    plot_file = str(time.time())+"_plot.png"
+    #plot_path = os.path.join(base_dir,plot_file)
+    plt.savefig(os.path.join(base_dir,plot_file))
 
 def setup():
     """
@@ -271,7 +293,12 @@ if __name__ == '__main__':
 
     device = setup()
 
-    cls_model = models.BertWithLSTMClassifier(77,bert_model)
+    if classifier == 'BertWithLSTMClassifier':
+        cls_model = models.BertWithLSTMClassifier(77,bert_model)
+    else if classifier == 'BertWithBiLSTMClassifier'
+        cls_model = models.BertWithBiLSTMClassifier(77,bert_model)
+    else:
+        pass
     cls_model.to(device)
 
     optimizer = AdamW(cls_model.parameters(), lr=hparams["learning_rate"])
@@ -281,7 +308,7 @@ if __name__ == '__main__':
     logging.info('Initialized optimizer.')
     print('Initialized loss function.')
 
-    train(base_dir, train_data, validation_data, cls_model, 3, optimizer, loss_fn, False)
+    train(base_dir, train_data, validation_data, cls_model, 20, optimizer, loss_fn, False)
 
 
 
