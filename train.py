@@ -293,9 +293,9 @@ if __name__ == '__main__':
 
     device = setup()
 
-    if classifier == 'BertWithLSTMClassifier':
+    if (classifier == 'BertWithLSTMClassifier'):
         cls_model = models.BertWithLSTMClassifier(77,bert_model)
-    else if classifier == 'BertWithBiLSTMClassifier'
+    else if (classifier == 'BertWithBiLSTMClassifier'):
         cls_model = models.BertWithBiLSTMClassifier(77,bert_model)
     else:
         pass
