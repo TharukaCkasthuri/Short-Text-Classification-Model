@@ -62,8 +62,8 @@ class BertWithBiLSTMClassifier(torch.nn.Module):
         self.n_classes = n_classes
         self.bert = BertModel.from_pretrained(model_name)
         self.hidden_size = self.bert.config.hidden_size
-        self.lstm = nn.LSTM(768, self.hidden_size, batch_first=True, bidirectional=True)
-        self.linear = nn.Linear(self.hidden_size*2, self.n_classes)
+        self.lstm = torch.nn.LSTM(768, self.hidden_size, batch_first=True, bidirectional=True)
+        self.linear = torch.nn.Linear(self.hidden_size*2, self.n_classes)
 
     def forward(self, tokens, attention_mask):
         output = self.bert(tokens, attention_mask=attention_mask)
