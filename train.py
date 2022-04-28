@@ -225,10 +225,11 @@ def train(base_dir, train_loader, val_loader, model, num_of_epochs, optimizer, l
 
         train_acc, train_f1, train_loss = evaluation_step(train_loader, model, loss_fn)
         val_acc, val_f1, val_loss = evaluation_step(val_loader, model, loss_fn)
-        train_f1s.append(train_f1.item())
-        validation_f1s.append(val_f1.item())
-        train_losses.append(train_loss.item())
-        validation_losses.append(validation_loss.item())
+
+        train_f1s.append(train_f1)
+        validation_f1s.append(val_f1)
+        train_losses.append(train_loss)
+        validation_losses.append(validation_loss)
         
         #print("Training results: ")
         #print("Acc: {:.3f}, f1: {:.3f}".format(train_acc, train_f1))
