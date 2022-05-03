@@ -1,4 +1,4 @@
-# Short Text Classification Using Deep Learning with Pytorch 
+# Short Text Classification Using BERT with Pytorch 
 
 ## This is a project developed for short text intent classification in banking conversational agents. 
 
@@ -16,22 +16,42 @@ The main objective of this repository is to demostrate the effect of various emb
    ```
 
 ### Training 
-1. **Download a dataset:**
 
-   The data used to demostrate the model can be found in following link : https://github.com/PolyAI-LDN/task-specific-datasets/tree/master/banking_data
+1. **Download the dataset:**
 
-    |id| text | target |
-| ------------- | ------------- | ------------- |
-| 1  | Our Deeds are the Reason of this #earthquake May ALLAH Forgive us all  |1  |
-| 2  | SOOOO PUMPED FOR ABLAZE ???? @southridgelife  | 0  |
-| 3  | INEC Office in Abia Set Ablaze - http://t.co/3ImaomknnA  | 1 |
-| 4  | Building the perfect tracklist to life leave the streets ablaze  | 0  |
+   The data used to demostrate the model can be found in following link : https://github.com/PolyAI-LDN/task-specific-datasets/tree/master/banking_data , and extract the data into the 'raw_data' folder.
 
    You can use other datasets if you convert them to the right format. 
 
+2. **Preprocessing Steps**
+   I'm using hugging face library as BERT implementation so an additional consideration to take into account is that Hugging Face's tokenizer employs subword tokenization as detailed in their summary here.
+    *   Fixing the negation of some of the auxiliary verbs (eg.: shouldnt -> should not) and some of the personal pronouns (eg.: im -> i am)
+    *   Replacing the special characters with apropriate words (Ex: & - and )
+    *   Removing numerical charaters.
+    *   Removing additional spaces.
 
 3. **Train a model**
+
+Models list : 
+    *   Bert with LSTM Layer for classification 
+    *   Bert with BiLSTM Layer for classification 
+    *   Bert with CNN Layer for classification 
 
    ```
    python3 train.py
    ```
+
+Can change some parameters like this,
+```
+ train.py [-h] [--classifier NAME OF CLASSIFICATION MODEL] [--stopwords_file STOPWORD_FILE]
+         [--base_dir BASE_DIR] [--input_data TRAINING_DATA]
+         [--label_column LABEL_COLUMN_NAME] [--text_column TEXT_COLUMN_NAME]
+         [--bert_model BERT_VERSION] [--hparams HYPERPARAMETERS_DICT]
+```
+
+4.  **Evaluating a model**
+5.  **Making Inference**
+
+
+
+
