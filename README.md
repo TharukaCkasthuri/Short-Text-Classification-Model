@@ -33,9 +33,10 @@ The main objective of this repository is to demostrate the effect of various emb
 3. **Train a model**
 
 Models list : 
-    *   Bert with LSTM Layer for classification 
-    *   Bert with BiLSTM Layer for classification 
-    *   Bert with CNN Layer for classification 
+
+*   Bert with LSTM Layer for classification 
+*   Bert with BiLSTM Layer for classification 
+*   Bert with CNN Layer for classification 
 
    ```
    python3 train.py
@@ -43,7 +44,7 @@ Models list :
 
 Can change some parameters like this,
 ```
- train.py [-h] [--classifier NAME OF CLASSIFICATION MODEL] [--stopwords_file STOPWORD_FILE]
+ train.py [--classifier NAME OF CLASSIFICATION MODEL] [--stopwords_file STOPWORD_FILE]
          [--base_dir BASE_DIR] [--input_data TRAINING_DATA]
          [--label_column LABEL_COLUMN_NAME] [--text_column TEXT_COLUMN_NAME]
          [--bert_model BERT_VERSION] [--hparams HYPERPARAMETERS_DICT]
