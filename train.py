@@ -309,7 +309,7 @@ if __name__ == '__main__':
                     bert_model = bert_model,
                     hparams = hparams)
 
-    train(base_dir, train_data, validation_data, classifier,bert_model, 20, loss_fn, False)
+    train(base_dir, train_data, validation_data, classifier,bert_model, 20, False)
 
 
 
