@@ -198,7 +198,7 @@ def evaluation_step(dataloader, model, loss_fn):
                 
     return acc, f1, loss
 
-def train(base_dir, train_loader, val_loader, model_name, bert_version, num_of_epochs, loss_fn, if_freeze_bert):
+def train(base_dir, train_loader, val_loader, model_name, bert_version, num_of_epochs, if_freeze_bert):
     """
     """
 
