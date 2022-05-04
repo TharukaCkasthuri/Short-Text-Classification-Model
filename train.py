@@ -198,7 +198,7 @@ def evaluation_step(dataloader, model, loss_fn):
                 
     return acc, f1, loss
 
-def train(base_dir, train_loader, val_loader, model_name, bert_version, num_of_epochs, optimizer, loss_fn, if_freeze_bert):
+def train(base_dir, train_loader, val_loader, model_name, bert_version, num_of_epochs, loss_fn, if_freeze_bert):
     """
     """
 
@@ -309,7 +309,7 @@ if __name__ == '__main__':
                     bert_model = bert_model,
                     hparams = hparams)
 
-    train(base_dir, train_data, validation_data, classifier,bert_model, 20, optimizer, loss_fn, False)
+    train(base_dir, train_data, validation_data, classifier,bert_model, 20, loss_fn, False)
 
 
 
