@@ -198,13 +198,23 @@ def evaluation_step(dataloader, model, loss_fn):
                 
     return acc, f1, loss
 
-def train(base_dir, train_loader, val_loader, model, num_of_epochs, optimizer, loss_fn, if_freeze_bert):
+def train(base_dir, train_loader, val_loader, model_name, bert_version, num_of_epochs, optimizer, loss_fn, if_freeze_bert):
     """
     """
 
+    device = setup()
+
+    if (model_name == 'BertWithLSTMClassifier'):
+        model = models.BertWithLSTMClassifier(77, bert_version)
+    elif (model_name == 'BertWithBiLSTMClassifier'):
+        model = models.BertWithBiLSTMClassifier(77, bert_version)
+    else:
+        pass
+    model.to(device)
+
     tqdm.pandas()
     best_acc, best_f1 = 0, 0
-    model_file_name = str(time.time()) + "_trained_model.pt"
+    model_file_name = str(time.time()) +str(model_name)+"_"+str(bert_version)+ "_trained_model.pt"
     path = os.path.join(base_dir,model_file_name)
 
     train_f1s = []
@@ -251,7 +261,7 @@ def train(base_dir, train_loader, val_loader, model, num_of_epochs, optimizer, l
     plt.plot(range(1, num_of_epochs+1), validation_losses, 'c', label='Validation Loss Curve')
     plt.title("Training/Validation F1 Score/Loss Curves")
     plt.legend()
-    plot_file = str(time.time())+"_plot.png"
+    plot_file = str(time.time()) +str(model_name)+"_"+str(bert_version)+"_plot.png"
     #plot_path = os.path.join(base_dir,plot_file)
     plt.savefig(os.path.join(base_dir,plot_file))
 
@@ -292,15 +302,7 @@ if __name__ == '__main__':
                     bert_model = bert_model,
                     hparams = hparams)
 
-    device = setup()
-
-    if (classifier == 'BertWithLSTMClassifier'):
-        cls_model = models.BertWithLSTMClassifier(77,bert_model)
-    elif (classifier == 'BertWithBiLSTMClassifier'):
-        cls_model = models.BertWithBiLSTMClassifier(77,bert_model)
-    else:
-        pass
-    cls_model.to(device)
+    
 
     optimizer = AdamW(cls_model.parameters(), lr=hparams["learning_rate"])
     logging.info('Initialized optimizer.')
@@ -309,7 +311,7 @@ if __name__ == '__main__':
     logging.info('Initialized optimizer.')
     print('Initialized loss function.')
 
-    train(base_dir, train_data, validation_data, cls_model, 20, optimizer, loss_fn, False)
+    train(base_dir, train_data, validation_data, cls_model,bert_model, 20, optimizer, loss_fn, False)
 
 
 
