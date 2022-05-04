@@ -212,6 +212,13 @@ def train(base_dir, train_loader, val_loader, model_name, bert_version, num_of_e
         pass
     model.to(device)
 
+    optimizer = AdamW(model.parameters(), lr=hparams["learning_rate"])
+    logging.info('Initialized optimizer.')
+    print('Initialized optimizer.')
+    loss_fn = torch.nn.CrossEntropyLoss()
+    logging.info('Initialized optimizer.')
+    print('Initialized loss function.')
+
     tqdm.pandas()
     best_acc, best_f1 = 0, 0
     model_file_name = str(time.time()) +str(model_name)+"_"+str(bert_version)+ "_trained_model.pt"
@@ -301,15 +308,6 @@ if __name__ == '__main__':
                     stopwords_file=stopwords_file , 
                     bert_model = bert_model,
                     hparams = hparams)
-
-    
-
-    optimizer = AdamW(cls_model.parameters(), lr=hparams["learning_rate"])
-    logging.info('Initialized optimizer.')
-    print('Initialized optimizer.')
-    loss_fn = torch.nn.CrossEntropyLoss()
-    logging.info('Initialized optimizer.')
-    print('Initialized loss function.')
 
     train(base_dir, train_data, validation_data, cls_model,bert_model, 20, optimizer, loss_fn, False)
 
